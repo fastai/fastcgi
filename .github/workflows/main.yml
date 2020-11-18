@@ -17,5 +17,5 @@ jobs:
         nbdev_clean_nbs
         git status -s
         [[ -n "$(git status -uno -s)" ]] && echo -e "!!! Detected unstripped out notebooks\nRemember to run nbdev_install_git_hooks" && false
-        #[[ -n "$(nbdev_diff_nbs)" ]] && echo -e "!!! Detected difference between the notebooks and the library" && false
+        [[ -n "$(nbdev_diff_nbs)" ]] && echo -e "!!! Detected difference between the notebooks and the library" && false
     - run: nbdev_test_nbs

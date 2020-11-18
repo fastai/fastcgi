@@ -1,4 +1,4 @@
-name: Python
+name: Cache
 on:
   workflow_dispatch:
 
@@ -13,7 +13,6 @@ jobs:
     - uses: actions/cache@v2
       with:
         path: ${{ env.pythonLocation }}
-        key: ${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('setup.py') }}-${{ hashFiles('dev-requirements.txt') }}
+        key: ${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('settings.ini') }}
     - name: Install requirements
-      run: |
-        pip install --upgrade --upgrade-strategy eager -r dev-requirements.txt
+      run: pip install --upgrade --upgrade-strategy eager -r dev-requirements.txt

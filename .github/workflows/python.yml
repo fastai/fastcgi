@@ -15,4 +15,4 @@ jobs:
         path: ${{ env.pythonLocation }}
         key: ${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('settings.ini') }}
     - name: Install requirements
-      run: pip install --upgrade --upgrade-strategy eager -r dev-requirements.txt
+      run: pip install --upgrade --upgrade-strategy eager -e .[dev]

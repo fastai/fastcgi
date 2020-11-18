@@ -1,7 +1,15 @@
 name: PR
 on:
+  workflow_dispatch:
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/setup-python@v
+    - uses: actions/setup-python@v2
+    - uses: actions/cache@v2
+      with:
+        path: ${{ env.pythonLocation }}
+        key: ${{ env.pythonLocation }}-${{ hashFiles('setup.py') }}-${{ hashFiles('dev-requirements.txt') }}
+    - name: Install requirements
+      run: pip install --upgrade --upgrade-strategy eager -r dev-requirements.txt -e .

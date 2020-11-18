@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+set -e
 fail() { echo -e "::error::${1}"; exit 1; }
 
 nbdev_read_nbs

@@ -1,4 +1,4 @@
-name: PR
+name: Python
 on:
   workflow_dispatch:
 

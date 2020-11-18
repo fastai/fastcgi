@@ -4,7 +4,7 @@ set -e
 case "$OSTYPE" in
   darwin*)  os=darwin; ;;
   linux*)   os=linux; ;;
-  windows*)   os=linux; ;;
+  windows*)   os=windows; ;;
   *)        echo "unknown: $OSTYPE" ;;
 esac
 

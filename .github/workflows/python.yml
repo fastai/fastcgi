@@ -4,14 +4,16 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
     - uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
     - uses: actions/cache@v2
       with:
         path: ${{ env.pythonLocation }}
-        key: ${{ runner.os }}-2-${{ env.pythonLocation }}-${{ hashFiles('setup.py') }}-${{ hashFiles('dev-requirements.txt') }}
+        key: ${{ runner.os }}-3-${{ env.pythonLocation }}-${{ hashFiles('setup.py') }}-${{ hashFiles('dev-requirements.txt') }}
     - name: Install requirements
       run: |
         uname -r

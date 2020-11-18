@@ -19,10 +19,7 @@ Status = Enum('Status', 'REQUEST_COMPLETE CANT_MPX_CONN OVERLOADED UNKNOWN_ROLE'
 
 # Cell
 def _S(fmt): return struct.Struct('!'+fmt) # use `struct` "network order"
-_rec_struct = _S('BBHHbb')
-_endreq_struct = _S('LBxxx')
-_begreq_struct = _S('Hb5s')
-
+_rec_struct,_endreq_struct,_begreq_struct = _S('BBHHbb'),_S('LBxxx'),_S('Hb5s')
 _chk_typs = Record.STDIN,Record.DATA
 _stream_typs = _chk_typs+(Record.PARAMS,Record.STDOUT,Record.STDERR)
 

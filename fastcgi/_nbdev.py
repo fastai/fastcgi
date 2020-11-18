@@ -2,7 +2,7 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {"Request": "00_core.ipynb",
+index = {"Record": "00_core.ipynb",
          "Role": "00_core.ipynb",
          "Status": "00_core.ipynb",
          "unpack_from": "00_core.ipynb",
@@ -11,7 +11,10 @@ index = {"Request": "00_core.ipynb",
          "unpack_sz": "00_core.ipynb",
          "unpack_rec": "00_core.ipynb",
          "unpack_content": "00_core.ipynb",
-         "FcgiHandler": "00_core.ipynb"}
+         "print_bytes": "00_core.ipynb",
+         "FcgiHandler": "00_core.ipynb",
+         "FcgiHandler.print": "00_core.ipynb",
+         "FcgiHandler.err": "00_core.ipynb"}
 
 modules = ["core.py"]
 

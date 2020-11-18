@@ -156,7 +156,7 @@ nb_path: "00_core.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="FcgiHandler" class="doc_header"><code>class</code> <code>FcgiHandler</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L99" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>FcgiHandler</code>(<strong><code>request</code></strong>, <strong><code>client_address</code></strong>, <strong><code>server</code></strong>) :: <code>BaseRequestHandler</code></p>
+<h2 id="FcgiHandler" class="doc_header"><code>class</code> <code>FcgiHandler</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L96" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>FcgiHandler</code>(<strong><code>request</code></strong>, <strong><code>client_address</code></strong>, <strong><code>server</code></strong>) :: <code>BaseRequestHandler</code></p>
 </blockquote>
 <p>Base class for request handler classes.</p>
 <p>This class is instantiated for each request to be handled.  The
@@ -232,10 +232,8 @@ can define other arbitrary instance variables.</p>
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;test.sock&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span>
-
-<span class="n">run</span><span class="p">(</span><span class="s1">&#39;./get_http2fcgi.sh&#39;</span><span class="p">)</span>
-<span class="n">proc</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;./http2fcgi -fcgi unix:///</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s1"> -ext py&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;./get_http2fcgi.sh&#39;</span><span class="p">)</span>
+<span class="n">proc</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="s1">&#39;./http2fcgi&#39;</span><span class="p">])</span>
 </pre></div>
 
     </div>
@@ -259,9 +257,11 @@ can define other arbitrary instance variables.</p>
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@threaded</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;fcgi.sock&#39;</span><span class="p">)</span>
+
+<span class="nd">@threaded</span>
 <span class="k">def</span> <span class="nf">_f</span><span class="p">():</span>
-    <span class="k">with</span> <span class="n">socketserver</span><span class="o">.</span><span class="n">UnixStreamServer</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">TestHandler</span><span class="p">)</span> <span class="k">as</span> <span class="n">server</span><span class="p">:</span> <span class="n">server</span><span class="o">.</span><span class="n">handle_request</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">socketserver</span><span class="o">.</span><span class="n">UnixStreamServer</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">TestHandler</span><span class="p">)</span> <span class="k">as</span> <span class="n">srv</span><span class="p">:</span> <span class="n">srv</span><span class="o">.</span><span class="n">handle_request</span><span class="p">()</span>
 
 <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span> <span class="n">p</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
 <span class="n">t</span> <span class="o">=</span> <span class="n">_f</span><span class="p">()</span>
@@ -357,7 +357,7 @@ stdin: b&#39;test&#39;
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="FcgiHandler.print" class="doc_header"><code>FcgiHandler.print</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L135" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>FcgiHandler.print</code>(<strong><code>s</code></strong>=<em><code>''</code></em>)</p>
+<h4 id="FcgiHandler.print" class="doc_header"><code>FcgiHandler.print</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L132" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>FcgiHandler.print</code>(<strong><code>s</code></strong>=<em><code>''</code></em>)</p>
 </blockquote>
 <p>Write a <code>str</code> to <code>self.stdout</code> as bytes, converting line endings to <code></code></p>
 
@@ -400,7 +400,7 @@ stdin: b&#39;test&#39;
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="FcgiHandler.err" class="doc_header"><code>FcgiHandler.err</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L141" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>FcgiHandler.err</code>(<strong><code>s</code></strong>=<em><code>''</code></em>)</p>
+<h4 id="FcgiHandler.err" class="doc_header"><code>FcgiHandler.err</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L138" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>FcgiHandler.err</code>(<strong><code>s</code></strong>=<em><code>''</code></em>)</p>
 </blockquote>
 <p>Write a <code>str</code> to <code>self.stderr</code> as bytes, converting line endings to <code></code></p>
 

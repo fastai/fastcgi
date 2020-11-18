@@ -79,8 +79,8 @@ reverse_proxy localhost:1234 { transport fastcgi }</code></pre>
     <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;query:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;QUERY_STRING&#39;</span><span class="p">])</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;content type:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;HTTP_CONTENT_TYPE&#39;</span><span class="p">])</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;stdin:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stdin</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s2">&quot;Content-type: text/html</span><span class="se">\r\n\r\n</span><span class="s2">&lt;html&gt;foobar&lt;/html&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;stdin:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;Content-type: text/html</span><span class="se">\r\n\r\n</span><span class="s2">&lt;html&gt;foobar&lt;/html&gt;</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -98,6 +98,7 @@ reverse_proxy localhost:1234 { transport fastcgi }</code></pre>
 </pre></div>
 <p>See the API docs for <a href="/fastcgi/core.html#FcgiHandler"><code>FcgiHandler</code></a> for an end-to-end example.</p>
 <p>You can also create a forking or threading server by using Python's <a href="https://docs.python.org/3/library/socketserver.html#socketserver.ThreadingMixIn">mixins or predefined classes</a>.</p>
+<p>In your <code>handle</code> method, you can use the <code>stdin</code>, <code>stdout</code>, and <code>stderr</code> attributes, which each contain a <code>BytesIO</code> stream.</p>
 
 </div>
 </div>

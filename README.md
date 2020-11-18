@@ -26,8 +26,8 @@ class TestHandler(FcgiHandler):
     def handle(self):
         print('query:', self.params['QUERY_STRING'])
         print('content type:', self.params['HTTP_CONTENT_TYPE'])
-        print('stdin:', self.stdin)
-        self.send("Content-type: text/html\r\n\r\n<html>foobar</html>\n")
+        print('stdin:', self.content)
+        self.stdout.write(b"Content-type: text/html\r\n\r\n<html>foobar</html>\r\n")
 ```
 
 You can run this using any of Python's `socketserver` classes, e.g to listen on localhost port 1234:
@@ -40,3 +40,5 @@ with TCPServer(('localhost',1234), TestHandler) as srv:
 See the API docs for `FcgiHandler` for an end-to-end example.
 
 You can also create a forking or threading server by using Python's [mixins or predefined classes](https://docs.python.org/3/library/socketserver.html#socketserver.ThreadingMixIn).
+
+In your `handle` method, you can use the `stdin`, `stdout`, and `stderr` attributes, which each contain a `BytesIO` stream.

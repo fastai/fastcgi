@@ -1,0 +1,14 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-python@v2
+      with: {python-version: '3.8'}
+    - name: Install and test
+      run: |
+        pip install --upgrade --upgrade-strategy eager -e .[dev]
+        bash .github/scripts/build.sh

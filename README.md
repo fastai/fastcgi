@@ -21,7 +21,7 @@ There's no new frameworks or concepts to learn. Just call `send` to send anythin
 
 Probably the only thing you need to use is `FcgiHandler`, which is used in much the same way as Python's [BaseRequestHandler](https://docs.python.org/3/library/socketserver.html#request-handler-objects). Here's an example:
 
-```python
+```
 class TestHandler(FcgiHandler):
     def handle(self):
         print('query:', self.params['QUERY_STRING'])

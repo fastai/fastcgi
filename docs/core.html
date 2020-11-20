@@ -107,6 +107,24 @@ nb_path: "00_core.ipynb"
     
 <div class="cell border-box-sizing code_cell rendered">
 
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="readlen" class="doc_header"><code>readlen</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L29" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>readlen</code>(<strong><code>r</code></strong>)</p>
+</blockquote>
+<p>Read the length of the next fcgi parameter</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
 </div>
     {% endraw %}
 
@@ -120,6 +138,18 @@ nb_path: "00_core.ipynb"
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="mi">1_000_000_101</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s1">&#39;!L&#39;</span><span class="p">,</span> <span class="n">t</span> <span class="o">|</span> <span class="p">(</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="mi">31</span><span class="p">))</span>
+<span class="n">test_eq</span><span class="p">(</span><span class="n">readlen</span><span class="p">(</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">),</span> <span class="n">t</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
 
 </div>
     {% endraw %}
@@ -127,6 +157,19 @@ nb_path: "00_core.ipynb"
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">_recv_struct</span><span class="p">(</span><span class="n">recv</span><span class="p">,</span> <span class="n">fmt</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fmt</span><span class="p">,</span><span class="n">struct</span><span class="o">.</span><span class="n">Struct</span><span class="p">):</span> <span class="n">fmt</span> <span class="o">=</span> <span class="n">_S</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">recv</span><span class="p">(</span><span class="n">fmt</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span> <span class="k">else</span> <span class="n">res</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
 
 </div>
     {% endraw %}
@@ -134,6 +177,170 @@ nb_path: "00_core.ipynb"
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">recv_record</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
+    <span class="n">_</span><span class="p">,</span><span class="n">typ</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">contentlen</span><span class="p">,</span><span class="n">padlen</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">_recv_struct</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">_rec_struct</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">_recv_struct</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">contentlen</span><span class="si">}</span><span class="s1">s</span><span class="si">{</span><span class="s2">&quot;x&quot;</span><span class="o">*</span><span class="n">padlen</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">typ</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="n">typ</span><span class="p">)</span>
+    <span class="k">if</span>   <span class="n">typ</span><span class="o">==</span><span class="n">Record</span><span class="o">.</span><span class="n">BEGIN_REQUEST</span><span class="p">:</span> <span class="n">c</span> <span class="o">=</span> <span class="n">_begreq_struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">c</span><span class="p">)[:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">typ</span><span class="o">==</span><span class="n">Record</span><span class="o">.</span><span class="n">ABORT_REQUEST</span><span class="p">:</span> <span class="n">c</span> <span class="o">=</span> <span class="p">()</span>
+    <span class="k">return</span> <span class="n">typ</span><span class="p">,</span><span class="n">c</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">b</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">read</span>
+<span class="n">recv_record</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+
+<span class="n">typ</span><span class="p">,</span><span class="n">p</span> <span class="o">=</span> <span class="n">recv_record</span><span class="p">(</span><span class="n">b</span><span class="p">);</span> <span class="n">typ</span><span class="p">,</span><span class="n">p</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(&lt;Record.PARAMS: 4&gt;,
+ b&#39;\x12\x10REQUEST_TIME_FLOAT1605811743685432\x0f\tPATH_TRANSLATED/setup.py\t\tPATH_INFO/setup.py\x13\x01HTTP_CONTENT_LENGTH4\x0e\x04REQUEST_METHODPOST\x0b\x03REMOTE_ADDR::1\x0b\x05REMOTE_PORT52102\x0b\tSCRIPT_NAME/setup.py\x0e\tORIG_PATH_INFO/setup.py\x0b\x03HTTP_ACCEPT*/*\x0f\x08SERVER_PROTOCOLHTTP/1.1\x0c\nREQUEST_TIME1605811743\x0c\x03QUERY_STRINGa=1\t\x0eHTTP_HOSTlocalhost:6065\x11\x10HTTP_CONTENT_TYPEapplication/json\x0f\tSERVER_SOFTWAREhttp2fcgi\r\tDOCUMENT_ROOT/setup.py\x0f\tSCRIPT_FILENAME/setup.py\x0b\rREQUEST_URI/setup.py?a=1\x0b\x00AUTH_DIGEST\x0f\x0bHTTP_USER_AGENTcurl/7.71.1&#39;)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">recv_record</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(&lt;Record.PARAMS: 4&gt;, b&#39;&#39;)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">_params</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">read</span>
+    <span class="k">while</span> <span class="n">b</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span><span class="o">&lt;</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="n">lk</span><span class="p">,</span><span class="n">lv</span> <span class="o">=</span> <span class="n">readlen</span><span class="p">(</span><span class="n">r</span><span class="p">),</span><span class="n">readlen</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">_recv_struct</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">lk</span><span class="si">}</span><span class="s1">s</span><span class="si">{</span><span class="n">lv</span><span class="si">}</span><span class="s1">s&#39;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">params</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="o">.</span><span class="n">decode</span><span class="p">():</span><span class="n">v</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">_params</span><span class="p">(</span><span class="n">s</span><span class="p">)}</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">params</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>{&#39;REQUEST_TIME_FLOAT&#39;: &#39;1605811743685432&#39;,
+ &#39;PATH_TRANSLATED&#39;: &#39;/setup.py&#39;,
+ &#39;PATH_INFO&#39;: &#39;/setup.py&#39;,
+ &#39;HTTP_CONTENT_LENGTH&#39;: &#39;4&#39;,
+ &#39;REQUEST_METHOD&#39;: &#39;POST&#39;,
+ &#39;REMOTE_ADDR&#39;: &#39;::1&#39;,
+ &#39;REMOTE_PORT&#39;: &#39;52102&#39;,
+ &#39;SCRIPT_NAME&#39;: &#39;/setup.py&#39;,
+ &#39;ORIG_PATH_INFO&#39;: &#39;/setup.py&#39;,
+ &#39;HTTP_ACCEPT&#39;: &#39;*/*&#39;,
+ &#39;SERVER_PROTOCOL&#39;: &#39;HTTP/1.1&#39;,
+ &#39;REQUEST_TIME&#39;: &#39;1605811743&#39;,
+ &#39;QUERY_STRING&#39;: &#39;a=1&#39;,
+ &#39;HTTP_HOST&#39;: &#39;localhost:6065&#39;,
+ &#39;HTTP_CONTENT_TYPE&#39;: &#39;application/json&#39;,
+ &#39;SERVER_SOFTWARE&#39;: &#39;http2fcgi&#39;,
+ &#39;DOCUMENT_ROOT&#39;: &#39;/setup.py&#39;,
+ &#39;SCRIPT_FILENAME&#39;: &#39;/setup.py&#39;,
+ &#39;REQUEST_URI&#39;: &#39;/setup.py?a=1&#39;,
+ &#39;AUTH_DIGEST&#39;: &#39;&#39;,
+ &#39;HTTP_USER_AGENT&#39;: &#39;curl/7.71.1&#39;}</pre>
+</div>
+
+</div>
+
+</div>
+</div>
 
 </div>
     {% endraw %}
@@ -156,7 +363,39 @@ nb_path: "00_core.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="FcgiHandler" class="doc_header"><code>class</code> <code>FcgiHandler</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L96" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>FcgiHandler</code>(<strong><code>request</code></strong>, <strong><code>client_address</code></strong>, <strong><code>server</code></strong>) :: <code>BaseRequestHandler</code></p>
+<h2 id="ByteStream" class="doc_header"><code>class</code> <code>ByteStream</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L45" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ByteStream</code>(<strong><code>typ</code></strong>:<a href="/fastcgi/core.html#Record"><code>Record</code></a>, <strong><code>req</code></strong>) :: <code>BytesIO</code></p>
+</blockquote>
+<p>Buffered I/O implementation using an in-memory bytes buffer.</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="FcgiHandler" class="doc_header"><code>class</code> <code>FcgiHandler</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L54" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>FcgiHandler</code>(<strong><code>request</code></strong>, <strong><code>client_address</code></strong>, <strong><code>server</code></strong>) :: <code>BaseRequestHandler</code></p>
 </blockquote>
 <p>Base class for request handler classes.</p>
 <p>This class is instantiated for each request to be handled.  The
@@ -189,8 +428,45 @@ can define other arbitrary instance variables.</p>
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>This is used in much the same way as <a href="https://docs.python.org/3/library/socketserver.html#request-handler-objects">BaseRecordHandler</a>, except that receiving the data is handled for you before your <code>handle</code> method is called. All headers are available in the <code>params</code> dictionary, and <code>stdin</code> contains the data sent to your handler.</p>
-<p>Use the <code>stdout</code> and <code>stderr</code> streams to send data to the client.</p>
+<p>This is used in much the same way as <a href="https://docs.python.org/3/library/socketserver.html#request-handler-objects">BaseRecordHandler</a>, except that receiving the data is handled for you before your <code>handle</code> method is called. All headers are available in the <code>params</code> dictionary. All streams are available through indexing (i.e. using <code>__getitem__</code>). The <code>stdin</code> stream contains the data sent to your handler. Write to the <code>stdout</code> and <code>stderr</code> streams to send data to the client, or use the <code>write</code> method.</p>
+
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="FcgiHandler.write" class="doc_header"><code>FcgiHandler.write</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L80" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>FcgiHandler.write</code>(<strong><code>b</code></strong>:<code>bytes</code>, <strong><code>err</code></strong>=<em><code>False</code></em>)</p>
+</blockquote>
+<p>Write <code>b</code> to stderr (if <code>err</code>) or stdout (otherwise)</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>Here's an example subclass:</p>
 
 </div>
@@ -208,7 +484,7 @@ can define other arbitrary instance variables.</p>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;query:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;QUERY_STRING&#39;</span><span class="p">])</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;content type:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;HTTP_CONTENT_TYPE&#39;</span><span class="p">])</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;stdin:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;Content-type: text/html</span><span class="se">\r\n\r\n</span><span class="s2">&lt;html&gt;foobar&lt;/html&gt;</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;Content-type: text/html</span><span class="se">\r\n\r\n</span><span class="s2">&lt;html&gt;foobar&lt;/html&gt;</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -261,7 +537,7 @@ can define other arbitrary instance variables.</p>
 
 <span class="nd">@threaded</span>
 <span class="k">def</span> <span class="nf">_f</span><span class="p">():</span>
-    <span class="k">with</span> <span class="n">socketserver</span><span class="o">.</span><span class="n">UnixStreamServer</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">TestHandler</span><span class="p">)</span> <span class="k">as</span> <span class="n">srv</span><span class="p">:</span> <span class="n">srv</span><span class="o">.</span><span class="n">handle_request</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">UnixStreamServer</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">TestHandler</span><span class="p">)</span> <span class="k">as</span> <span class="n">srv</span><span class="p">:</span> <span class="n">srv</span><span class="o">.</span><span class="n">handle_request</span><span class="p">()</span>
 
 <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span> <span class="n">p</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
 <span class="n">t</span> <span class="o">=</span> <span class="n">_f</span><span class="p">()</span>
@@ -304,7 +580,7 @@ can define other arbitrary instance variables.</p>
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>query: a=1
 content type: application/json
-stdin: b&#39;test&#39;
+stdin: &lt;memory at 0x7fd969beb7a0&gt;
 
 </pre>
 </div>
@@ -350,6 +626,13 @@ stdin: b&#39;test&#39;
     
 <div class="cell border-box-sizing code_cell rendered">
 
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
 <div class="output_wrapper">
 <div class="output">
 
@@ -357,7 +640,7 @@ stdin: b&#39;test&#39;
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="FcgiHandler.print" class="doc_header"><code>FcgiHandler.print</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L132" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>FcgiHandler.print</code>(<strong><code>s</code></strong>=<em><code>''</code></em>)</p>
+<h4 id="FcgiHandler.print" class="doc_header"><code>FcgiHandler.print</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L94" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>FcgiHandler.print</code>(<strong><code>s</code></strong>=<em><code>''</code></em>)</p>
 </blockquote>
 <p>Write a <code>str</code> to <code>self.stdout</code> as bytes, converting line endings to <code></code></p>
 
@@ -400,7 +683,7 @@ stdin: b&#39;test&#39;
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="FcgiHandler.err" class="doc_header"><code>FcgiHandler.err</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L138" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>FcgiHandler.err</code>(<strong><code>s</code></strong>=<em><code>''</code></em>)</p>
+<h4 id="FcgiHandler.err" class="doc_header"><code>FcgiHandler.err</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L100" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>FcgiHandler.err</code>(<strong><code>s</code></strong>=<em><code>''</code></em>)</p>
 </blockquote>
 <p>Write a <code>str</code> to <code>self.stderr</code> as bytes, converting line endings to <code></code></p>
 

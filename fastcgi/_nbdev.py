@@ -6,11 +6,12 @@ index = {"Record": "00_core.ipynb",
          "Role": "00_core.ipynb",
          "Status": "00_core.ipynb",
          "readlen": "00_core.ipynb",
-         "ByteStream": "00_core.ipynb",
+         "send_record": "00_core.ipynb",
+         "send_stream": "00_core.ipynb",
          "FcgiHandler": "00_core.ipynb",
-         "FcgiHandler.write": "00_core.ipynb",
          "FcgiHandler.print": "00_core.ipynb",
-         "FcgiHandler.err": "00_core.ipynb"}
+         "FcgiHandler.err": "00_core.ipynb",
+         "FcgiHandler.write": "00_core.ipynb"}
 
 modules = ["core.py"]
 

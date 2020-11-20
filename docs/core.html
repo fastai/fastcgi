@@ -363,7 +363,7 @@ nb_path: "00_core.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ByteStream" class="doc_header"><code>class</code> <code>ByteStream</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L45" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ByteStream</code>(<strong><code>typ</code></strong>:<a href="/fastcgi/core.html#Record"><code>Record</code></a>, <strong><code>req</code></strong>) :: <code>BytesIO</code></p>
+<h2 id="ByteStream" class="doc_header"><code>class</code> <code>ByteStream</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L45" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ByteStream</code>(<strong><code>typ</code></strong>:<a href="/fastcgi/core.html#Record"><code>Record</code></a>, <strong><code>r</code></strong>) :: <code>BytesIO</code></p>
 </blockquote>
 <p>Buffered I/O implementation using an in-memory bytes buffer.</p>
 
@@ -395,19 +395,9 @@ nb_path: "00_core.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="FcgiHandler" class="doc_header"><code>class</code> <code>FcgiHandler</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L54" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>FcgiHandler</code>(<strong><code>request</code></strong>, <strong><code>client_address</code></strong>, <strong><code>server</code></strong>) :: <code>BaseRequestHandler</code></p>
+<h2 id="FcgiHandler" class="doc_header"><code>class</code> <code>FcgiHandler</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L54" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>FcgiHandler</code>(<strong><code>request</code></strong>, <strong><code>client_address</code></strong>, <strong><code>server</code></strong>) :: <code>StreamRequestHandler</code></p>
 </blockquote>
-<p>Base class for request handler classes.</p>
-<p>This class is instantiated for each request to be handled.  The
-constructor sets the instance variables request, client_address
-and server, and then calls the handle() method.  To implement a
-specific service, all you need to do is to derive a class which
-defines a handle() method.</p>
-<p>The handle() method can find the request as self.request, the
-client address as self.client_address, and the server (in case it
-needs access to per-server information) as self.server.  Since a
-separate instance is created for each request, the handle() method
-can define other arbitrary instance variables.</p>
+<p>A request handler that processes FastCGI streams and parameters</p>
 
 </div>
 
@@ -428,7 +418,7 @@ can define other arbitrary instance variables.</p>
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>This is used in much the same way as <a href="https://docs.python.org/3/library/socketserver.html#request-handler-objects">BaseRecordHandler</a>, except that receiving the data is handled for you before your <code>handle</code> method is called. All headers are available in the <code>params</code> dictionary. All streams are available through indexing (i.e. using <code>__getitem__</code>). The <code>stdin</code> stream contains the data sent to your handler. Write to the <code>stdout</code> and <code>stderr</code> streams to send data to the client, or use the <code>write</code> method.</p>
+<p>This is used in much the same way as <a href="https://docs.python.org/3/library/socketserver.html#request-handler-objects">StreamRequestHandler</a>, except that receiving the data is handled for you before your <code>handle</code> method is called. All headers are available in the <code>params</code> dictionary. All streams are available through indexing (i.e. using <code>__getitem__</code>). The <code>stdin</code> stream contains the data sent to your handler. Write to the <code>stdout</code> and <code>stderr</code> streams to send data to the client, or use the <code>write</code> method.</p>
 
 </div>
 </div>
@@ -444,7 +434,7 @@ can define other arbitrary instance variables.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="FcgiHandler.write" class="doc_header"><code>FcgiHandler.write</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L80" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>FcgiHandler.write</code>(<strong><code>b</code></strong>:<code>bytes</code>, <strong><code>err</code></strong>=<em><code>False</code></em>)</p>
+<h4 id="FcgiHandler.write" class="doc_header"><code>FcgiHandler.write</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L83" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>FcgiHandler.write</code>(<strong><code>b</code></strong>:<code>bytes</code>, <strong><code>err</code></strong>=<em><code>False</code></em>)</p>
 </blockquote>
 <p>Write <code>b</code> to stderr (if <code>err</code>) or stdout (otherwise)</p>
 
@@ -580,7 +570,7 @@ can define other arbitrary instance variables.</p>
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>query: a=1
 content type: application/json
-stdin: &lt;memory at 0x7fd969beb7a0&gt;
+stdin: &lt;memory at 0x7f1b205b1a10&gt;
 
 </pre>
 </div>
@@ -640,7 +630,7 @@ stdin: &lt;memory at 0x7fd969beb7a0&gt;
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="FcgiHandler.print" class="doc_header"><code>FcgiHandler.print</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L94" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>FcgiHandler.print</code>(<strong><code>s</code></strong>=<em><code>''</code></em>)</p>
+<h4 id="FcgiHandler.print" class="doc_header"><code>FcgiHandler.print</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L97" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>FcgiHandler.print</code>(<strong><code>s</code></strong>=<em><code>''</code></em>)</p>
 </blockquote>
 <p>Write a <code>str</code> to <code>self.stdout</code> as bytes, converting line endings to <code></code></p>
 
@@ -683,7 +673,7 @@ stdin: &lt;memory at 0x7fd969beb7a0&gt;
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="FcgiHandler.err" class="doc_header"><code>FcgiHandler.err</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L100" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>FcgiHandler.err</code>(<strong><code>s</code></strong>=<em><code>''</code></em>)</p>
+<h4 id="FcgiHandler.err" class="doc_header"><code>FcgiHandler.err</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L103" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>FcgiHandler.err</code>(<strong><code>s</code></strong>=<em><code>''</code></em>)</p>
 </blockquote>
 <p>Write a <code>str</code> to <code>self.stderr</code> as bytes, converting line endings to <code></code></p>
 

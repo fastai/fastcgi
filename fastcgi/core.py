@@ -8,7 +8,7 @@ from fastcore.utils import *
 from fastcore.meta import *
 
 import struct
-from socketserver import BaseRequestHandler,UnixStreamServer,TCPServer
+from socketserver import StreamRequestHandler,BaseRequestHandler,UnixStreamServer,TCPServer
 from enum import Enum
 from io import BytesIO,TextIOWrapper
 
@@ -35,36 +35,39 @@ def readlen(r):
     return res
 
 # Cell
-def _send_content(req, typ, *args):
+def _send_content(r, typ, *args):
     "Send the content section of a fastcgi binary record of `typ` to `req`"
     if typ==Record.END_REQUEST: c = _endreq_struct.pack(*args)
     else: c = args[0] if args else b''
-    req.send(_rec_struct.pack(1, typ.value, 1, len(c), 0, 0) + c)
+    r(_rec_struct.pack(1, typ.value, 1, len(c), 0, 0) + c)
 
 # Cell
 class ByteStream(BytesIO):
-    def __init__(self, typ:Record, req): self.typ,self.req = typ,req
+    def __init__(self, typ:Record, r): self.typ,self.r = typ,r
 
-    def _send(self, *args): _send_content(self.req, self.typ, *args)
+    def _send(self, *args): _send_content(self.r, self.typ, *args)
     def send(self):
         for o in chunked(self.getvalue(), 2**15): self._send(bytes(o))
         self._send()
 
 # Cell
-class FcgiHandler(BaseRequestHandler):
+class FcgiHandler(StreamRequestHandler):
+    "A request handler that processes FastCGI streams and parameters"
     def setup(self):
-        self.streams = L(_streams).map_dict(ByteStream, req=self.request)
+        super().setup()
+        self.streams = L(_streams).map_dict(ByteStream, r=self.wfile.write)
         sz,self.length = 0,1
         while sz<self.length: sz += ifnone(self._recv(), 0)
 
     def finish(self):
+        super().finish()
         self['stdout'].send()
         self['stderr'].send()
         self['end_request']._send(0, Status.REQUEST_COMPLETE.value)
         self['stdin'].seek(0)
 
     def _recv(self):
-        typ,c = recv_record(self.request.recv)
+        typ,c = recv_record(self.rfile.read)
         if typ in _streams_in:
             self[typ].write(c)
             if typ==Record.PARAMS and not c:

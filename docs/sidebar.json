@@ -1,6 +1,7 @@
 {
   "fastcgi": {
     "Overview": "/",
-    "fastcgi API": "core.html"
+    "fastcgi API": "core.html",
+    "fastcgi.decorator": "decorator.html"
   }
 }

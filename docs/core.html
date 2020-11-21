@@ -114,7 +114,7 @@ nb_path: "00_core.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="readlen" class="doc_header"><code>readlen</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L30" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>readlen</code>(<strong><code>r</code></strong>)</p>
+<h4 id="readlen" class="doc_header"><code>readlen</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L31" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>readlen</code>(<strong><code>r</code></strong>)</p>
 </blockquote>
 <p>Read the length of the next fcgi parameter</p>
 
@@ -157,17 +157,29 @@ nb_path: "00_core.ipynb"
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">_recv_struct</span><span class="p">(</span><span class="n">recv</span><span class="p">,</span> <span class="n">fmt</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fmt</span><span class="p">,</span><span class="n">struct</span><span class="o">.</span><span class="n">Struct</span><span class="p">):</span> <span class="n">fmt</span> <span class="o">=</span> <span class="n">_S</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">recv</span><span class="p">(</span><span class="n">fmt</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span> <span class="k">else</span> <span class="n">res</span>
-</pre></div>
+</div>
+    {% endraw %}
 
-    </div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="recv_record" class="doc_header"><code>recv_record</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L46" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>recv_record</code>(<strong><code>r</code></strong>)</p>
+</blockquote>
+<p>Receive one fastcgi record from <code>r</code></p>
+
+</div>
+
+</div>
+
 </div>
 </div>
 
@@ -177,22 +189,6 @@ nb_path: "00_core.ipynb"
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">recv_record</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
-    <span class="n">_</span><span class="p">,</span><span class="n">typ</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">contentlen</span><span class="p">,</span><span class="n">padlen</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">_recv_struct</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">_rec_struct</span><span class="p">)</span>
-    <span class="n">c</span> <span class="o">=</span> <span class="n">_recv_struct</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">contentlen</span><span class="si">}</span><span class="s1">s</span><span class="si">{</span><span class="s2">&quot;x&quot;</span><span class="o">*</span><span class="n">padlen</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-    <span class="n">typ</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="n">typ</span><span class="p">)</span>
-    <span class="k">if</span>   <span class="n">typ</span><span class="o">==</span><span class="n">Record</span><span class="o">.</span><span class="n">BEGIN_REQUEST</span><span class="p">:</span> <span class="n">c</span> <span class="o">=</span> <span class="n">_begreq_struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">c</span><span class="p">)[:</span><span class="mi">2</span><span class="p">]</span>
-    <span class="k">elif</span> <span class="n">typ</span><span class="o">==</span><span class="n">Record</span><span class="o">.</span><span class="n">ABORT_REQUEST</span><span class="p">:</span> <span class="n">c</span> <span class="o">=</span> <span class="p">()</span>
-    <span class="k">return</span> <span class="n">typ</span><span class="p">,</span><span class="n">c</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
 
 </div>
     {% endraw %}
@@ -270,24 +266,31 @@ nb_path: "00_core.ipynb"
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">_params</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="n">b</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">read</span>
-    <span class="k">while</span> <span class="n">b</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span><span class="o">&lt;</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-        <span class="n">lk</span><span class="p">,</span><span class="n">lv</span> <span class="o">=</span> <span class="n">readlen</span><span class="p">(</span><span class="n">r</span><span class="p">),</span><span class="n">readlen</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
-        <span class="k">yield</span> <span class="n">_recv_struct</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">lk</span><span class="si">}</span><span class="s1">s</span><span class="si">{</span><span class="n">lv</span><span class="si">}</span><span class="s1">s&#39;</span><span class="p">)</span>
+<div class="output_wrapper">
+<div class="output">
 
-<span class="k">def</span> <span class="nf">params</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="o">.</span><span class="n">decode</span><span class="p">():</span><span class="n">v</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">_params</span><span class="p">(</span><span class="n">s</span><span class="p">)}</span>
-</pre></div>
+<div class="output_area">
 
-    </div>
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="params" class="doc_header"><code>params</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L63" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>params</code>(<strong><code>s</code></strong>:<code>bytes</code>)</p>
+</blockquote>
+<p>Parse fastcgi parameters from <code>s</code></p>
+
+</div>
+
+</div>
+
 </div>
 </div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
 
 </div>
     {% endraw %}
@@ -356,7 +359,7 @@ nb_path: "00_core.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="send_record" class="doc_header"><code>send_record</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L39" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>send_record</code>(<strong><code>typ</code></strong>, <strong><code>w</code></strong>, <strong><code>c</code></strong>=<em><code>b''</code></em>)</p>
+<h4 id="send_record" class="doc_header"><code>send_record</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L68" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>send_record</code>(<strong><code>typ</code></strong>, <strong><code>w</code></strong>, <strong><code>c</code></strong>=<em><code>b''</code></em>)</p>
 </blockquote>
 <p>Send fastcgi binary record of <code>typ</code> to <code>w</code></p>
 
@@ -388,7 +391,7 @@ nb_path: "00_core.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="send_stream" class="doc_header"><code>send_stream</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L44" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>send_stream</code>(<strong><code>typ</code></strong>, <strong><code>w</code></strong>, <strong><code>s</code></strong>)</p>
+<h4 id="send_stream" class="doc_header"><code>send_stream</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L73" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>send_stream</code>(<strong><code>typ</code></strong>, <strong><code>w</code></strong>, <strong><code>s</code></strong>)</p>
 </blockquote>
 <p>Send fastcgi stream of <code>typ</code> to <code>w</code></p>
 
@@ -412,6 +415,26 @@ nb_path: "00_core.ipynb"
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">_Stream</span><span class="p">(</span><span class="n">BytesIO</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="nb">bytes</span><span class="p">):</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
 
 <div class="output_wrapper">
 <div class="output">
@@ -420,7 +443,7 @@ nb_path: "00_core.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="FcgiHandler" class="doc_header"><code>class</code> <code>FcgiHandler</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L51" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>FcgiHandler</code>(<strong><code>request</code></strong>, <strong><code>client_address</code></strong>, <strong><code>server</code></strong>) :: <code>StreamRequestHandler</code></p>
+<h2 id="FcgiHandler" class="doc_header"><code>class</code> <code>FcgiHandler</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L81" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>FcgiHandler</code>(<strong><code>request</code></strong>, <strong><code>client_address</code></strong>, <strong><code>server</code></strong>) :: <code>StreamRequestHandler</code></p>
 </blockquote>
 <p>A request handler that processes FastCGI streams and parameters</p>
 
@@ -443,7 +466,7 @@ nb_path: "00_core.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>This is used in much the same way as <a href="https://docs.python.org/3/library/socketserver.html#request-handler-objects">StreamRequestHandler</a>, except that receiving the data is handled for you before your <code>handle</code> method is called. All headers are available in the <code>params</code> dictionary. All streams are available through indexing (i.e. using <code>__getitem__</code>). The <code>stdin</code> stream contains the data sent to your handler. Write to the <code>stdout</code> and <code>stderr</code> streams to send data to the client.</p>
+<p>This is used in much the same way as <a href="https://docs.python.org/3/library/socketserver.html#request-handler-objects">StreamRequestHandler</a>, except that receiving the data is handled for you before your <code>handle</code> method is called. All headers are available in the <a href="/fastcgi/core.html#params"><code>params</code></a> dictionary. All streams are available through indexing (i.e. using <code>__getitem__</code>). The <code>stdin</code> stream contains the data sent to your handler. Write to the <code>stdout</code> and <code>stderr</code> streams to send data to the client.</p>
 
 </div>
 </div>
@@ -618,6 +641,56 @@ stdin: b&#39;foo=bar&amp;greeting=%E4%BD%A0%E5%A5%BD&#39;
     
 <div class="cell border-box-sizing code_cell rendered">
 
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="TextWrapper" class="doc_header"><code>class</code> <code>TextWrapper</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L109" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>TextWrapper</code>(<strong><code>buffer</code></strong>, <strong><code>encoding</code></strong>=<em><code>None</code></em>, <strong><code>errors</code></strong>=<em><code>None</code></em>, <strong><code>newline</code></strong>=<em><code>None</code></em>, <strong><code>line_buffering</code></strong>=<em><code>False</code></em>, <strong><code>write_through</code></strong>=<em><code>False</code></em>) :: <code>TextIOWrapper</code></p>
+</blockquote>
+<p>Character and line based layer over a BufferedIOBase object, buffer.</p>
+<p>encoding gives the name of the encoding that the stream will be
+decoded or encoded with. It defaults to locale.getpreferredencoding(False).</p>
+<p>errors determines the strictness of encoding and decoding (see
+help(codecs.Codec) or the documentation for codecs.register) and
+defaults to "strict".</p>
+<p>newline controls how line endings are handled. It can be None, '',
+'\n', '\r', and '\r\n'.  It works as follows:</p>
+<ul>
+<li><p>On input, if newline is None, universal newlines mode is
+enabled. Lines in the input can end in '\n', '\r', or '\r\n', and
+these are translated into '\n' before being returned to the
+caller. If it is '', universal newline mode is enabled, but line
+endings are returned to the caller untranslated. If it has any of
+the other legal values, input lines are only terminated by the given
+string, and the line ending is returned to the caller untranslated.</p>
+</li>
+<li><p>On output, if newline is None, any '\n' characters written are
+translated to the system default line separator, os.linesep. If
+newline is '' or '\n', no translation takes place. If newline is any
+of the other legal values, any '\n' characters written are translated
+to the given string.</p>
+</li>
+</ul>
+<p>If line_buffering is True, a call to flush is implied when a call to
+write contains a newline character.</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
 </div>
     {% endraw %}
 
@@ -632,7 +705,7 @@ stdin: b&#39;foo=bar&amp;greeting=%E4%BD%A0%E5%A5%BD&#39;
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="FcgiHandler.print" class="doc_header"><code>FcgiHandler.print</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L87" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>FcgiHandler.print</code>(<strong><code>s</code></strong>=<em><code>''</code></em>)</p>
+<h4 id="FcgiHandler.print" class="doc_header"><code>FcgiHandler.print</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L117" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>FcgiHandler.print</code>(<strong><code>s</code></strong>=<em><code>''</code></em>)</p>
 </blockquote>
 <p>Write a <code>str</code> to <code>self.stdout</code> as bytes, converting line endings to <code></code></p>
 
@@ -671,7 +744,7 @@ stdin: b&#39;foo=bar&amp;greeting=%E4%BD%A0%E5%A5%BD&#39;
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="FcgiHandler.err" class="doc_header"><code>FcgiHandler.err</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L93" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>FcgiHandler.err</code>(<strong><code>s</code></strong>=<em><code>''</code></em>)</p>
+<h4 id="FcgiHandler.err" class="doc_header"><code>FcgiHandler.err</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L123" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>FcgiHandler.err</code>(<strong><code>s</code></strong>=<em><code>''</code></em>)</p>
 </blockquote>
 <p>Write a <code>str</code> to <code>self.stderr</code> as bytes, converting line endings to <code></code></p>
 
@@ -702,19 +775,31 @@ stdin: b&#39;foo=bar&amp;greeting=%E4%BD%A0%E5%A5%BD&#39;
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@patch</span>
-<span class="k">def</span> <span class="nf">content</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span><span class="n">FcgiHandler</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">str</span><span class="p">:</span>
-    <span class="s2">&quot;Contents of stdin&quot;</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;stdin&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
-</pre></div>
+<div class="output_wrapper">
+<div class="output">
 
-    </div>
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="FcgiHandler.content" class="doc_header"><code>FcgiHandler.content</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L129" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>FcgiHandler.content</code>()</p>
+</blockquote>
+<p>Contents of stdin</p>
+
+</div>
+
+</div>
+
 </div>
 </div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
 
 </div>
     {% endraw %}
@@ -730,7 +815,7 @@ stdin: b&#39;foo=bar&amp;greeting=%E4%BD%A0%E5%A5%BD&#39;
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="FcgiHandler.write" class="doc_header"><code>FcgiHandler.write</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L99" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>FcgiHandler.write</code>(<strong><code>b</code></strong>:<code>bytes</code>, <strong><code>err</code></strong>=<em><code>False</code></em>)</p>
+<h4 id="FcgiHandler.write" class="doc_header"><code>FcgiHandler.write</code><a href="https://github.com/fastai/fastcgi/tree/master/fastcgi/core.py#L135" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>FcgiHandler.write</code>(<strong><code>b</code></strong>:<code>bytes</code>, <strong><code>err</code></strong>=<em><code>False</code></em>)</p>
 </blockquote>
 <p>Write <code>b</code> to stderr (if <code>err</code>) or stdout (otherwise)</p>
 

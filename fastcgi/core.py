@@ -110,8 +110,7 @@ class TextWrapper(TextIOWrapper): close=TextIOWrapper.flush
 
 def _print_bytes(s:str, stream):
     "Convert `s` to `bytes`, using `\r\n` for newlines"
-    b = TextWrapper(stream, newline='\r\n', encoding='utf8')
-    print(s, file=b)
+    print(s, file=TextWrapper(stream, newline='\r\n', encoding='utf8'))
 
 # Cell
 @patch

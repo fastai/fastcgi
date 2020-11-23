@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 from fastcore.script import *
 import sys,os
-from time import sleep
-
-time.sleep(1)
 
 @call_parse
 def hello():

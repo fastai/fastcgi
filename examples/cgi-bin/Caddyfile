@@ -1,0 +1,3 @@
+:1234
+reverse_proxy unix/fcgi.sock { transport fastcgi }
+

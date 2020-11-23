@@ -2,6 +2,7 @@
   "fastcgi": {
     "Overview": "/",
     "fastcgi API": "core.html",
-    "fastcgi.decorator": "decorator.html"
+    "fastcgi.decorator": "decorator.html",
+    "fastcgi.http": "http.html"
   }
 }

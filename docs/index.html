@@ -6,8 +6,8 @@ title: fastcgi
 keywords: fastai
 sidebar: home_sidebar
 
-summary: "A fastcgi handler for Python's `socketserver` classes"
-description: "A fastcgi handler for Python's `socketserver` classes"
+summary: "FastCGI and HTTP handlers for Python's `socketserver` classes"
+description: "FastCGI and HTTP handlers for Python's `socketserver` classes"
 nb_path: "index.ipynb"
 ---
 <!--
@@ -32,12 +32,15 @@ nb_path: "index.ipynb"
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><a href="http://www.mit.edu/~yandros/doc/specs/fcgi-spec.html">FastCGI</a> is a way for front-end servers to talk to back-end workers in a (somewhat) efficient and (somewhat) simple way. Although it's been around since 1996, it is not very widely appreciated, except in the PHP community, where it is very commonly used.</p>
-<p>It can be a great approach for hosting Python scripts, avoiding the overhead of creating a new Python process for every request (as standard CGI would otherwise require) and without requiring large dependencies, complex C projects, or fiddly deployments. <code>fastcgi</code> has no dependencies other than <a href="https://fastcore.fast.ai/">fastcore</a>.</p>
-<p>There's no new frameworks or concepts to learn. Just call <code>send</code> to send anything you like back to the client, read the parameters from <code>params</code>, and the input from the client from <code>stdin</code>.</p>
-<p><code>fastcgi</code> requires a front-end web server. If you don't already have one set up, we recommend <a href="https://caddyserver.com/">Caddy</a>. To forward all requests to <code>example.com</code> to a <code>fastcgi</code> server listening on port 1234 create a file called <code>Caddyfile</code> with the following contents, and then <code>caddy run</code>:</p>
+<p>It can be a great approach for hosting Python scripts, avoiding the overhead of creating a new Python process for every request (as standard CGI would otherwise require) and without requiring large dependencies, complex C projects, or fiddly deployments. <a href="/fastcgi/decorator.html#fastcgi"><code>fastcgi</code></a> has no dependencies other than <a href="https://fastcore.fast.ai/">fastcore</a>.</p>
+<p>There's no new frameworks or concepts to learn. Just call <code>send</code> to send anything you like back to the client, read the parameters from <a href="/fastcgi/core.html#params"><code>params</code></a>, and the input from the client from <code>stdin</code>.</p>
+<p><a href="/fastcgi/decorator.html#fastcgi"><code>fastcgi</code></a> requires a front-end web server. If you don't already have one set up, we recommend <a href="https://caddyserver.com/">Caddy</a>. To forward all requests to <code>example.com</code> to a <a href="/fastcgi/decorator.html#fastcgi"><code>fastcgi</code></a> server listening on port 1234 create a file called <code>Caddyfile</code> with the following contents, and then <code>caddy run</code>:</p>
 
 <pre><code>example.com
-reverse_proxy localhost:1234 { transport fastcgi }</code></pre>
+reverse_proxy localhost:1234 { transport fastcgi }
+
+</code></pre>
+<p>This library also provides an HTTP handler that can be used in an identical way, except remove <code>{ transport fastcgi }</code> from the above <code>Caddyfile</code> example. Python's standard library already includes an HTTP handler (in <code>http.server</code>), however the documentation warns that that module should not be used in production code. The HTTP handler provided here is trimmed down to a minimal implementation (just 40 lines of code) so that it can easily be studied and extended. It uses the same basic API as Python's other <code>socketserver</code> classes (and the same as <a href="/fastcgi/core.html#FcgiHandler"><code>FcgiHandler</code></a> here) so there's fewer new concepts to understand.</p>
 
 </div>
 </div>
@@ -63,7 +66,41 @@ reverse_proxy localhost:1234 { transport fastcgi }</code></pre>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Probably the only thing you need to use is <a href="/fastcgi/core.html#FcgiHandler"><code>FcgiHandler</code></a>, which is used in much the same way as Python's <a href="https://docs.python.org/3/library/socketserver.html#request-handler-objects">BaseRequestHandler</a>. Here's an example:</p>
+<p>See the full docs pages for each class for details. Quick overviews of each approach are shown below.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="fastcgi-decorator">fastcgi decorator<a class="anchor-link" href="#fastcgi-decorator"> </a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Using the <a href="/fastcgi/decorator.html#fastcgi"><code>fastcgi</code></a> decorator you can use CGI scripts with minimal changes. Just add the decorator above a function used for CGI, and it converts that script automatically into a FastCGI server, e.g if you save this as <code>server.py</code>:</p>
+<div class="highlight"><pre><span></span><span class="nd">@fastcgi</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">hello</span><span class="p">():</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;QUERY_STRING&quot;</span><span class="p">]</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Content-type: text/html</span><span class="se">\r\n\r\n</span><span class="s2">&lt;html&gt;</span><span class="si">{</span><span class="n">content</span><span class="si">}</span><span class="s2"> ; &quot;</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&lt;/html&gt;</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+<p>...then if you run <code>python server.py</code> it will make a unix socket available as <code>fcgi.sock</code> in the current directory.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="FcgiHandler">FcgiHandler<a class="anchor-link" href="#FcgiHandler"> </a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a href="/fastcgi/core.html#FcgiHandler"><code>FcgiHandler</code></a> is used in much the same way as Python's <a href="https://docs.python.org/3/library/socketserver.html#request-handler-objects">BaseRequestHandler</a>. Here's an example:</p>
 
 </div>
 </div>
@@ -77,10 +114,10 @@ reverse_proxy localhost:1234 { transport fastcgi }</code></pre>
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">TestHandler</span><span class="p">(</span><span class="n">FcgiHandler</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;query:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;QUERY_STRING&#39;</span><span class="p">])</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;content type:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;HTTP_CONTENT_TYPE&#39;</span><span class="p">])</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;stdin:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;Content-type: text/html</span><span class="se">\r\n\r\n</span><span class="s2">&lt;html&gt;foobar&lt;/html&gt;</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;query:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;QUERY_STRING&#39;</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;content type:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;HTTP_CONTENT_TYPE&#39;</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;stdin:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;stdin&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;stdout&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;Content-type: text/html</span><span class="se">\r\n\r\n</span><span class="s2">&lt;html&gt;foobar&lt;/html&gt;</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -99,6 +136,30 @@ reverse_proxy localhost:1234 { transport fastcgi }</code></pre>
 <p>See the API docs for <a href="/fastcgi/core.html#FcgiHandler"><code>FcgiHandler</code></a> for an end-to-end example.</p>
 <p>You can also create a forking or threading server by using Python's <a href="https://docs.python.org/3/library/socketserver.html#socketserver.ThreadingMixIn">mixins or predefined classes</a>.</p>
 <p>In your <code>handle</code> method, you can use the <code>stdin</code>, <code>stdout</code>, and <code>stderr</code> attributes, which each contain a <code>BytesIO</code> stream.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="MinimalHTTPHandler">MinimalHTTPHandler<a class="anchor-link" href="#MinimalHTTPHandler"> </a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a href="/fastcgi/decorator.html#fastcgi"><code>fastcgi</code></a> also comes with the <a href="/fastcgi/http.html#MinimalHTTPHandler"><code>MinimalHTTPHandler</code></a> class, which provides very similar functionality to <a href="/fastcgi/core.html#FcgiHandler"><code>FcgiHandler</code></a>, but using the <code>HTTP</code> protocol instead of the <code>FastCGI</code> protocol. Here's an example:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">_TestHandler</span><span class="p">(</span><span class="n">MinimalHTTPHandler</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Command/path/version: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">request_version</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_response</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_header</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">,</span> <span class="s2">&quot;text/plain&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_header</span><span class="p">(</span><span class="s1">&#39;Content-Length&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_headers</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;ok&#39;</span><span class="p">)</span>
+</pre></div>
+<p>You can run it with a <code>socketserver</code> server in the same way shown above for <a href="/fastcgi/core.html#FcgiHandler"><code>FcgiHandler</code></a>.</p>
 
 </div>
 </div>

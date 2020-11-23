@@ -17,10 +17,14 @@ index = {"Record": "00_core.ipynb",
          "FcgiHandler.content": "00_core.ipynb",
          "FcgiHandler.write": "00_core.ipynb",
          "ForkingUnixServer": "01_decorator.ipynb",
-         "fastcgi": "01_decorator.ipynb"}
+         "fastcgi": "01_decorator.ipynb",
+         "ReuseThreadingServer": "02_http.ipynb",
+         "HandlerException": "02_http.ipynb",
+         "MinimalHTTPHandler": "02_http.ipynb"}
 
 modules = ["core.py",
-           "decorator.py"]
+           "decorator.py",
+           "http.py"]
 
 doc_url = "https://fastai.github.io/fastcgi/"
 

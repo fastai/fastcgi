@@ -540,13 +540,12 @@ nb_path: "00_core.ipynb"
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;fcgi.sock&#39;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span> <span class="n">p</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
 
 <span class="nd">@threaded</span>
 <span class="k">def</span> <span class="nf">_f</span><span class="p">():</span>
     <span class="k">with</span> <span class="n">UnixStreamServer</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">TestHandler</span><span class="p">)</span> <span class="k">as</span> <span class="n">srv</span><span class="p">:</span> <span class="n">srv</span><span class="o">.</span><span class="n">handle_request</span><span class="p">()</span>
-
-<span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span> <span class="n">p</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
-<span class="n">t</span> <span class="o">=</span> <span class="n">_f</span><span class="p">()</span>
+<span class="n">_f</span><span class="p">()</span>
 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span> <span class="c1"># wait for server to start</span>
 </pre></div>
 

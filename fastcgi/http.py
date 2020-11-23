@@ -5,6 +5,7 @@ __all__ = ['ReuseThreadingServer', 'HandlerException', 'MinimalHTTPHandler']
 # Cell
 from http import client,HTTPStatus
 from socketserver import ThreadingTCPServer,StreamRequestHandler
+from fastcore.foundation import add_docs
 
 # Cell
 class ReuseThreadingServer(ThreadingTCPServer): allow_reuse_address = 1
@@ -48,3 +49,12 @@ class MinimalHTTPHandler(StreamRequestHandler):
             except ValueError: message = ''
         self._headers_buffer = [f"{self.protocol_version} {code} {message}\r\n"]
         self.send_header("Connection", "close")
+
+# Cell
+add_docs(MinimalHTTPHandler, "A greatly simplified version of `BaseHTTPHandler`. Overriding `handle` is required.",
+         setup="Overriden from `BaseRequestHandler`",
+         setup_ex="Override to handle exceptions in `setup`",
+         send_response="Set the HTTP response code to `code`",
+         send_header="Send a MIME header to the headers buffer",
+         end_headers="Send the blank line ending the MIME headers",
+         MessageClass="Class used for `http.client.parse_headers")

@@ -33,6 +33,7 @@ def fastcgi(sock='fcgi.sock', func=None):
     srv_type = ForkingUnixServer if isinstance(sock,str) else ForkingTCPServer
     f = partial(srv_type, sock, DecorateHandler)
     if mod and mod.__name__=="__main__":
+        if isinstance(sock,str) and os.path.exists(sock): os.unlink(sock)
         try:
             with f() as srv: srv.serve_forever()
         except KeyboardInterrupt:
